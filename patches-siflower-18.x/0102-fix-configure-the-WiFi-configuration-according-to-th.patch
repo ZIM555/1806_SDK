@@ -1,0 +1,29 @@
+From 567ecf0289f829e7fa306dfdb958f6b0f5f7e09e Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Thu, 27 May 2021 15:17:18 +0800
+Subject: [PATCH] fix: configure the WiFi configuration according to the
+ features of GLiNet
+
+Signed-off-by: GL.iNet-Xinfa.Deng <xinfa.deng@gl-inet.com>
+---
+ .../package/kernel/sf_smac/config/sfwifi-a28.sh    |  4 +--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/openwrt-18.06/package/kernel/sf_smac/config/sfwifi-a28.sh b/openwrt-18.06/package/kernel/sf_smac/config/sfwifi-a28.sh
+index 780c586..6474cca 100755
+--- a/openwrt-18.06/package/kernel/sf_smac/config/sfwifi-a28.sh
++++ b/openwrt-18.06/package/kernel/sf_smac/config/sfwifi-a28.sh
+@@ -56,8 +56,8 @@ insmod_umac(){
+     use_80=${use_80-1}
+     custregd=${custregd-0}
+     lp_clk_ppm=${lp_clk_ppm-1000}
+-    addr_maskall=${addr_maskall-0}
+-	not_send_null=${not_send_null-0}
++    addr_maskall=${addr_maskall-1}
++    not_send_null=${not_send_null-1}
+     ps_on=${ps_on-1}
+     tx_lft=${tx_lft-100}
+     tdls=${tdls-1}
+-- 
+2.7.4
+

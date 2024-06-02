@@ -1,0 +1,70 @@
+From 86d89ac691482761b0ddf07d4aafecd0d49df94b Mon Sep 17 00:00:00 2001
+From: "GL.iNet-Xinfa.Deng" <xinfa.deng@gl-inet.com>
+Date: Wed, 20 Apr 2022 09:48:09 +0800
+Subject: [PATCH] feat: spi nand support gigadevice
+
+---
+ .../linux-4.14.90/drivers/mtd/nand/spi/esmt.c          |  4 +++-
+ .../linux-4.14.90/include/linux/mtd/spinand.h          | 18 ++++++++++++++++++
+ 2 files changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/esmt.c b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/esmt.c
+index e8bf521..9bdd89a 100644
+--- a/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/esmt.c
++++ b/linux-4.14.90-dev/linux-4.14.90/drivers/mtd/nand/spi/esmt.c
+@@ -95,8 +95,10 @@ static int esmt_spinand_detect(struct spinand_device *spinand)
+ 
+ 	ret = spinand_match_and_init(spinand, esmt_spinand_table,
+ 				     ARRAY_SIZE(esmt_spinand_table), id[2]);
+-	if (ret)
++	if (ret > 0)
+ 		return ret;
++	else
++		return 0;
+ 
+ 	return 1;
+ }
+diff --git a/linux-4.14.90-dev/linux-4.14.90/include/linux/mtd/spinand.h b/linux-4.14.90-dev/linux-4.14.90/include/linux/mtd/spinand.h
+index 67438cf..5e15c12 100644
+--- a/linux-4.14.90-dev/linux-4.14.90/include/linux/mtd/spinand.h
++++ b/linux-4.14.90-dev/linux-4.14.90/include/linux/mtd/spinand.h
+@@ -68,18 +68,36 @@
+ 		   SPI_MEM_OP_DUMMY(ndummy, 1),				\
+ 		   SPI_MEM_OP_DATA_IN(len, buf, 1))
+ 
++#define SPINAND_PAGE_READ_FROM_CACHE_OP_3A(fast, addr, ndummy, buf, len) \
++	SPI_MEM_OP(SPI_MEM_OP_CMD(fast ? 0x0b : 0x03, 1),		\
++		   SPI_MEM_OP_ADDR(3, addr, 1),				\
++		   SPI_MEM_OP_DUMMY(ndummy, 1),				\
++		   SPI_MEM_OP_DATA_IN(len, buf, 1))
++
+ #define SPINAND_PAGE_READ_FROM_CACHE_X2_OP(addr, ndummy, buf, len)	\
+ 	SPI_MEM_OP(SPI_MEM_OP_CMD(0x3b, 1),				\
+ 		   SPI_MEM_OP_ADDR(2, addr, 1),				\
+ 		   SPI_MEM_OP_DUMMY(ndummy, 1),				\
+ 		   SPI_MEM_OP_DATA_IN(len, buf, 2))
+ 
++#define SPINAND_PAGE_READ_FROM_CACHE_X2_OP_3A(addr, ndummy, buf, len)	\
++	SPI_MEM_OP(SPI_MEM_OP_CMD(0x3b, 1),				\
++		   SPI_MEM_OP_ADDR(3, addr, 1),				\
++		   SPI_MEM_OP_DUMMY(ndummy, 1),				\
++		   SPI_MEM_OP_DATA_IN(len, buf, 2))
++
+ #define SPINAND_PAGE_READ_FROM_CACHE_X4_OP(addr, ndummy, buf, len)	\
+ 	SPI_MEM_OP(SPI_MEM_OP_CMD(0x6b, 1),				\
+ 		   SPI_MEM_OP_ADDR(2, addr, 1),				\
+ 		   SPI_MEM_OP_DUMMY(ndummy, 1),				\
+ 		   SPI_MEM_OP_DATA_IN(len, buf, 4))
+ 
++#define SPINAND_PAGE_READ_FROM_CACHE_X4_OP_3A(addr, ndummy, buf, len)	\
++	SPI_MEM_OP(SPI_MEM_OP_CMD(0x6b, 1),				\
++		   SPI_MEM_OP_ADDR(3, addr, 1),				\
++		   SPI_MEM_OP_DUMMY(ndummy, 1),				\
++		   SPI_MEM_OP_DATA_IN(len, buf, 4))
++
+ #define SPINAND_PAGE_READ_FROM_CACHE_DUALIO_OP(addr, ndummy, buf, len)	\
+ 	SPI_MEM_OP(SPI_MEM_OP_CMD(0xbb, 1),				\
+ 		   SPI_MEM_OP_ADDR(2, addr, 2),				\
+-- 
+2.7.4
+
