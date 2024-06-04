@@ -1,5 +1,8 @@
-diff --git a/openwrt-18.06/package/base-files/files/bin/gl_i2c_led b/openwrt-18.06/package/base-files/files/bin/gl_i2c_led
+diff --git a/f.patch b/f.patch
 new file mode 100644
+index 000000000..e69de29bb
+diff --git a/openwrt-18.06/package/base-files/files/bin/gl_i2c_led b/openwrt-18.06/package/base-files/files/bin/gl_i2c_led
+new file mode 100755
 index 000000000..e77f5496f
 --- /dev/null
 +++ b/openwrt-18.06/package/base-files/files/bin/gl_i2c_led
