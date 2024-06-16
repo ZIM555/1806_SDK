@@ -21,7 +21,8 @@ cd SFT1200-1806_SDK
 git config --global user.email "you@email.com"
 git config --global user.name "Developer"
 
-git reset --hard 
+git reset --hard
+
 git clean -df
 
 git apply patches-siflower-18.x/*.patch
