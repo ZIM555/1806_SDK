@@ -14,11 +14,12 @@ python3-pyelftools libpython3-dev qemu-utils rsync scons squashfs-tools \
 subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd \
 zlib1g-dev libfuse-dev
 
-
 git clone https://github.com/ZIM555/SFT1200-1806_SDK.git
+
 cd SFT1200-1806_SDK
 
 git config --global user.email "you@email.com"
+
 git config --global user.name "Developer"
 
 git reset --hard
@@ -30,10 +31,13 @@ git apply patches-siflower-18.x/*.patch
 cd openwrt-18.06
 
 ./scripts/feeds update -a
+
 ./scripts/feeds install -a
 
 make menuconfig
 
 export FORCE_UNSAFE_CONFIGURE=1
+
 wget https://github.com/wekingchen/Actions-SFT1200/raw/main/board-2.bin.ddcec9efd245da9365c474f513a855a55f3ac7fe -P dl/
+
 make -j$(nproc) V=s
