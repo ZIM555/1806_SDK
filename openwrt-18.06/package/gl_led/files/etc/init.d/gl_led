@@ -1,0 +1,108 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+STOP=10
+SERVICE_USE_PID=1
+SERVICE_WRITE_PID=1
+PID_FILE=/var/run/gl_led.pid
+
+reset_led(){
+    i2cset  -f -y 0 0x30 0x00 0x1F  #reset
+    i2cset  -f -y 0 0x30 0x00 0x1A  #mode3
+}
+
+set_brightness_led(){
+    # Set brightness
+    i2cset  -f -y 0 0x30 0x06 0x0a
+    i2cset  -f -y 0 0x30 0x07 0x0a
+}
+
+# Option:
+# off
+# blue
+# white
+# both
+# blue_flash <normal|medium|fast>
+# white_flash <normal|medium|fast>
+# both_flash <normal|medium|fast>
+# blue_breath
+# white_breath
+
+gl_i2c_led(){
+    reset_led
+    set_brightness_led
+
+    case $1 in
+        blue | white | both )
+            if [ $1 = "blue" ]; then
+                i2cset  -f -y 0 0x30 0x04 0x01
+            elif [ $1 = "white" ];then
+                i2cset  -f -y 0 0x30 0x04 0x04
+            elif [ $1 = "both" ];then
+                i2cset  -f -y 0 0x30 0x04 0x05
+            fi
+        ;;
+        blue_flash | white_flash | both_flash )
+            #flashing
+	
+            [ "$2" == "fast" ] && i2cset  -f -y 0 0x30 0x01 0x01  #period : 0.256s
+            [ "$2" == "medium" ] && i2cset  -f -y 0 0x30 0x01 0x03  #period : 0.512s
+            [ -z "$2" -o "$2" == "normal" ] && i2cset  -f -y 0 0x30 0x01 0x07  #period : 1.024s
+            i2cset  -f -y 0 0x30 0x02 0x7f  #Percentage of Period[%]
+            if [ $1 = "blue_flash" ]; then
+                i2cset  -f -y 0 0x30 0x04 0x02
+            elif [ $1 = "white_flash" ];then
+                i2cset  -f -y 0 0x30 0x04 0x08
+            elif [ $1 = "both_flash" ];then
+                i2cset  -f -y 0 0x30 0x04 0x0A
+            fi
+        ;;
+        blue_breath | white_breath | both_breath )
+            #breath
+            i2cset  -f -y 0 0x30 0x01 0x20  #period : 4.096s
+            i2cset  -f -y 0 0x30 0x02 0x7f  #Percentage of Period[100/0xff]%
+            i2cset  -f -y 0 0x30 0x05 0xFF  #ramp time : 768ms
+            if [ $1 = "blue_breath" ]; then
+                i2cset  -f -y 0 0x30 0x04 0x02
+            elif [ $1 = "white_breath" ];then
+                i2cset  -f -y 0 0x30 0x04 0x08
+            elif [ $1 = "both_breath" ];then
+                i2cset  -f -y 0 0x30 0x04 0x0A
+            fi
+        ;;
+        off )
+            i2cset  -f -y 0 0x30 0x04 0x00
+        ;;
+    esac
+}
+
+start() {
+    echo "Starting my service..."
+    echo $! > $PID_FILE
+
+    gl_led_state=$(uci get gl.@gl_led[0].state)
+    if [ "$gl_led_state" ]; then
+       gl_i2c_led "$gl_led_state"
+    fi
+}
+
+stop() {
+    echo "Stopping my service..."
+    if [ -f "$PID_FILE" ]; then
+        kill $(cat $PID_FILE)
+        rm -f $PID_FILE
+    fi
+}
+
+restart() {
+    stop
+    start
+}
+
+boot() {
+    start
+}
+
+shutdown() {
+    stop
+}

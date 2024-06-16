@@ -1,0 +1,2 @@
+config gl_led
+    option state 'white'
